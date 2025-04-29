@@ -126,3 +126,67 @@ async def recalculate_categories(
 def fetch_rules():
     config = load_rules()
     return config.get("rules", [])
+
+@router.post("/budget")
+async def upsert_budget(
+    db=Depends(get_db),
+    body: dict = Body(...)
+):
+    period = body.get("period")
+    exchangeRate = body.get("exchangeRate")
+    items = body.get("items")
+
+    if not period or not isinstance(items, list):
+        raise HTTPException(status_code=400, detail="Missing or invalid fields")
+
+    for item in items:
+        if not all(key in item for key in ["category", "amount", "currency"]):
+            raise HTTPException(status_code=400, detail="Invalid item structure")
+
+    # Upsert the budget document
+    result = await db["budgets"].update_one(
+        {"period": period},
+        {"$set": {"items": items, "exchangeRate": exchangeRate}},
+        upsert=True
+    )
+
+    return {"message": "Budget upserted successfully", "matched_count": result.matched_count}
+
+@router.get("/budget/{period}")
+async def get_budget_summary(period: str, db=Depends(get_db)):
+    # Fetch the budget for the given period
+    budget = await db["budgets"].find_one({"period": period})
+    if not budget:
+        raise HTTPException(status_code=404, detail="Budget not found for the specified period")
+
+    exchange_rate = budget.get("exchangeRate", 1)  # Default to 1 if not provided
+    budget_summary = []
+
+    for item in budget["items"]:
+        category = item["category"]
+        budget_amount = item["amount"]
+
+        # Calculate the total expenses for the category in the given period
+        total_expenses = await db["expenses"].aggregate([
+            {"$match": {"period": period, "category": category}},
+            {"$group": {"_id": "$currency", "total": {"$sum": "$amount"}}}
+        ]).to_list(None)
+
+        # Adjust total expenses based on currency
+        total_expenses_converted = 0
+        for expense in total_expenses:
+            if expense["_id"] == "USD":
+                total_expenses_converted += expense["total"] * exchange_rate
+            else:
+                total_expenses_converted += expense["total"]
+
+        remaining = budget_amount - total_expenses_converted
+
+        budget_summary.append({
+            "category": category,
+            "budget_amount": budget_amount,
+            "total_expenses": total_expenses_converted,
+            "remaining": remaining
+        })
+
+    return {"period": period, "summary": budget_summary}

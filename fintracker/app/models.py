@@ -11,3 +11,6 @@ async def get_expenses(db: AsyncIOMotorDatabase):
 async def add_expense(db: AsyncIOMotorDatabase, expense: Expense):
     expense_dict = expense.dict()
     await db["expenses"].insert_one(expense_dict)
+
+async def get_budget_by_period(db: AsyncIOMotorDatabase, period: str):
+    return await db["budgets"].find_one({"period": period})
