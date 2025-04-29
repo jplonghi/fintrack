@@ -1,0 +1,140 @@
+{
+    "periods": [
+        {
+            "identifier": "2025-01",
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-27T23:59:59Z"
+        },
+        {
+            "identifier": "2025-02",
+            "start": "2025-01-28T00:00:00Z",
+            "end": "2025-02-27T23:59:59Z"
+        }
+    ],
+    "rules": [
+        {
+            "priority": 1,
+            "name": "Supermercado",
+            "match": [
+                "AUTO MERCADO",
+                "WALMART",
+                "SUPER SUERTE",
+                "AM PM",
+                "PRICE SMART",
+                "PRISMART"
+            ],
+            "colors": {
+                "background": "#a970ff",
+                "text": "#a970ff"
+            }
+        },
+        {
+            "priority": 2,
+            "name": "Restaurante",
+            "match": [
+                "KFC",
+                "ARCOS DORADOS",
+                "STARBUCKS",
+                "Compadres"
+            ],
+            "colors": {
+                "background": "#FF4500",
+                "text": "#ff70a9"
+            }
+        },
+        {
+            "priority": 2,
+            "name": "Gasolina",
+            "match": [
+                "ESTACION DE SERVICIO",
+                "BOMBA"
+            ],
+            "colors": {
+                "background": "#1E90FF",
+                "text": "#ffcf70"
+            }
+        },
+        {
+            "priority": 2,
+            "name": "Suscripciones",
+            "match": [
+                "ZWIFT",
+                "Disney Plus",
+                "Netflix"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "Salud",
+            "match": [
+                "CONSULTORES MEDICOS"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "Pension",
+            "match": [
+                "BN-VITAL"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "Mascotas",
+            "match": [
+                "HVA NUTRICION",
+                "DR JORGE CALDERON"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "Farmacia",
+            "match": [
+                "FARMAVALUE",
+                "FISCHEL"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "ComprasOnline",
+            "match": [
+                "AMAZON"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "JP",
+            "match": [
+                "NUEVO MUNDO"
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "Servicios",
+            "match": [
+                "TELECABLE"
+            ]
+        },
+        {
+            "priority": 3,
+            "name": "Otros",
+            "match": [
+                "COMPASS",
+                "OXIGEN HUMAN PLAY GROUND COMPA",
+                "PANADERIA",
+                "ALM EL REY",
+                "TOYS",
+                "PEQUENO MUNDO",
+                "VIVERO"
+
+            ]
+        },
+        {
+            "priority": 2,
+            "name": "Pagos",
+            "match": [
+                "Pago"
+            ]
+        }
+    ],
+    "default_category": "Default"
+}
