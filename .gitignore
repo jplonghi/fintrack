@@ -40,7 +40,9 @@ __pycache__/
 # macOS
 .AppleDouble
 .LSOverride
+.DS_Store
 
 # Windows
 Thumbs.db
 Desktop.ini
+
