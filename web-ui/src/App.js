@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './App.css';
 import ExpensesList from './components/ExpensesList';
 import BudgetProcess from './components/BudgetProgress';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, createTheme, CssBaseline, FormControl, Select, MenuItem, OutlinedInput } from '@mui/material';
 import axios from 'axios';
 
 const darkTheme = createTheme({
@@ -32,22 +32,44 @@ const darkTheme = createTheme({
 
 function App() {
   const [totals, setTotals] = useState({ CRC: 0, USD: 0 });
+  const [selectedPeriod, setSelectedPeriod] = useState('2025-08'); // Default to current period
+  const [availablePeriods, setAvailablePeriods] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // Add refresh trigger
 
+  // Fetch available periods
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/expenses')
+    axios.get('http://127.0.0.1:8000/periods')
       .then(response => {
-        const expenses = response.data;
-        const totalCRC = expenses
-          .filter(expense => expense.currency === 'CRC')
-          .reduce((sum, expense) => sum + expense.amount, 0);
-        const totalUSD = expenses
-          .filter(expense => expense.currency === 'USD')
-          .reduce((sum, expense) => sum + expense.amount, 0);
-        setTotals({ CRC: totalCRC, USD: totalUSD });
+        const periods = response.data.periods;
+        
+        setAvailablePeriods(periods);
+        
+        // Only update selectedPeriod if current one is not in available periods
+        if (periods.length > 0 && !periods.includes(selectedPeriod)) {
+          setSelectedPeriod(periods[0]);
+        }
       })
       .catch(error => {
-        console.error('Error fetching totals:', error);
+        console.error('Error fetching periods:', error);
       });
+  }, []); // Keep empty dependency array
+
+  // Fetch totals based on selected period
+  useEffect(() => {
+    // Remove this effect since totals will come from ExpensesList
+  }, []);
+
+  const handleTotalsChange = useCallback((newTotals) => {
+    setTotals(newTotals);
+  }, []);
+
+  const handlePeriodChange = useCallback((event) => {
+    setSelectedPeriod(event.target.value);
+  }, []);
+
+  // Function to trigger refresh in ExpensesList
+  const triggerExpensesRefresh = useCallback(() => {
+    setRefreshTrigger(prev => prev + 1);
   }, []);
 
   return (
@@ -67,9 +89,46 @@ function App() {
           <div style={{
             display: 'flex',
             gap: '20px',
+            alignItems: 'center',
           }}>
+            {/* Period Selector */}
             <div style={{
-  
+              padding: '10px',
+              borderRadius: '10px',
+              border: '1px solid #a970ff',
+              minWidth: '200px',
+              textAlign: 'center',
+            }}>
+              <h3 style={{ color: '#a970ff', marginBottom: '10px', fontSize: '1.2rem' }}>Period</h3>
+              <FormControl size="small" fullWidth>
+                <Select
+                  value={selectedPeriod}
+                  onChange={handlePeriodChange}
+                  input={<OutlinedInput />}
+                  style={{ color: '#ffffff' }}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#a970ff',
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#a970ff',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#a970ff',
+                    },
+                  }}
+                >
+                  {availablePeriods.map((period) => (
+                    <MenuItem key={period} value={period}>
+                      {period}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+            
+            {/* Total Cards */}
+            <div style={{
               color: '#ffffff',
               padding: '10px',
               borderRadius: '10px',
@@ -83,7 +142,6 @@ function App() {
               </p>
             </div>
             <div style={{
-        
               color: '#ffffff',
               padding: '10px',
               borderRadius: '10px',
@@ -100,10 +158,10 @@ function App() {
         </div>
         <div style={{ display: 'flex', marginTop: '40px' }}>
           <div style={{ flex: 1, marginRight: '20px' }}>
-            <BudgetProcess />
+            <BudgetProcess selectedPeriod={selectedPeriod} onRecalculate={triggerExpensesRefresh} />
           </div>
           <div style={{ flex: 2 }}>
-            <ExpensesList />
+            <ExpensesList selectedPeriod={selectedPeriod} onTotalsChange={handleTotalsChange} refreshTrigger={refreshTrigger} />
           </div>
         </div>
       </div>

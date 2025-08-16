@@ -1,8 +1,13 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.schemas import Expense
 
-async def get_expenses(db: AsyncIOMotorDatabase):
-    expenses = await db["expenses"].find().to_list(100)
+async def get_expenses(db: AsyncIOMotorDatabase, period: str = None):
+    # Build the query filter
+    query_filter = {}
+    if period:
+        query_filter["period"] = period
+    
+    expenses = await db["expenses"].find(query_filter).to_list(1000)
     # Convert ObjectId to string for each document
     for expense in expenses:
         expense["_id"] = str(expense["_id"])

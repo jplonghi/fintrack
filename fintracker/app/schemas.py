@@ -8,11 +8,13 @@ class Expense(BaseModel):
     amount: float
     currency: str
     category: Optional[str] = None
+    period: Optional[str] = None
 
 class BudgetItem(BaseModel):
     category: str
     amount: float
     currency: str
+    tags: List[str] = []
 
 class Budget(BaseModel):
     period: str
